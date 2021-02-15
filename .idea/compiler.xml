@@ -9,5 +9,8 @@
         <module name="Flow1BankProject" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="Flow1BankProject" target="8" />
+    </bytecodeTargetLevel>
   </component>
 </project>

@@ -1,0 +1,9 @@
+As a ___ I want to ___ so that ____
+
+As a 'customer' I want to 'be able to withdraw money' so that I 'can withdraw money'
+
+As a 'customer' I want to 'be able to deposit money' so that I 'can deposit money'
+
+As a 'customer' I want to 'be able to view my transactions' so that I 'know what money I've withdrawn and deposited'
+
+As a 'bank teller / employee' I want to 'transfer money between customers' accounts' so that I 'can transfer money'
