@@ -4,8 +4,6 @@ import java.util.List;
 
 public class Account
 {
-    
-    
     private List<Transaction> transactions;
     private User user;
     
@@ -20,21 +18,32 @@ public class Account
         return transactions;
     }
     
-    public void deposit(double amount)
+    public double getBalance()
     {
-        // TODO: perhaps return balance
+        double sum = 0;
+        for (Transaction t : transactions)
+        {
+            sum += t.getAmount();
+        }
+        return sum;
+    }
+    
+    public double deposit(double amount)
+    {
         if(amount < 0)
         {
             // TODO: throw exception instead
             System.out.println("Amount cannot be negative");
-            return;
+            return -1;
         }
         transactions.add(new Transaction(amount, new Date()));
+        return getBalance();
     }
     
-    public void withdraw(double amount)
+    public double withdraw(double amount)
     {
         // TODO: check if greater than balance
         transactions.add(new Transaction(-amount, new Date()));
+        return getBalance();
     }
 }
