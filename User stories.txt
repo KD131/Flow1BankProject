@@ -1,11 +1,65 @@
 As a ___ I want to ___ so that ____
 
+#1
 As a 'customer' I want to 'be able to withdraw money' so that I 'can turn my virtual currency into physical currency'
 
+#2
 As a 'customer' I want to 'be able to deposit money' so that I 'can turn my physical money into virtual currency'
 
+#3
 As a 'customer' I want to 'be able to view my transactions' so that I 'know what money I've withdrawn and deposited'
 
+#4
+As an admin,
+I want to access a list of accounts,
+so that I can transfer money between them.
+
+#5
 As a 'bank teller / employee' I want to 'be able to transfer money between customers' accounts' so that I 'can facilitate a transaction on their behalf'
 
+#6
 As a 'customer' I want to 'be able to transfer money to other accounts' so that I 'can pay people without needing to withdraw physical money'
+
+
+ACCEPTANCE CRITERIA
+===================
+Given ... [precondition] (setup)
+When ... [actor + action] (trigger)
+Then ... [observable result] (verification)
+
+#1
+Given money in the account,
+when customer withdraws an amount lower than their current balance,
+then that amount is subtracted from their account balance.
+
+Given money in the account,
+when customer withdraws an amount greater than their current balance,
+then an error is produced.
+
+
+#2
+Given an amount greater than 0,
+when customer deposits that amount,
+then that amount is added to their account balance.
+
+Given an amount smaller than 0,
+when customer deposits that amount,
+then an error is produced.
+
+
+#3
+Given a customer with an account,
+when customer wants to see list of transaction,
+a list of transactions is shown.
+
+
+#4
+Given a request to transfer funds,
+when admin views a list of accounts,
+a list of accounts is shown.
+
+
+#5
+Given a request to transfer funds from one account to another,
+when admin transfers money between those account,
+money is subtracted from the giver's account balance and added to the recipient's account balance.
