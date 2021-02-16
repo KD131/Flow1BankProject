@@ -25,8 +25,22 @@ CREATE TABLE accounts(
 );
 */
 
-INSERT INTO accounts (employee, `name`, city, username, `password`) VALUES (1, "Kris", "B-Town", "kris12", "wasspord");
-INSERT INTO accounts (bank_id, `name`, city, balance) VALUES ("60982341", "Test User 1", "K-Town", "4007");
-INSERT INTO accounts (bank_id, `name`, balance) VALUES ("98321732", "Test User 2", "11372");
+-- INSERT INTO accounts (employee, `name`, city, username, `password`) VALUES (1, "Kris", "B-Town", "kris12", "wasspord");
+-- INSERT INTO accounts (bank_id, `name`, city, balance) VALUES ("60982341", "Test User 1", "K-Town", "4007");
+-- INSERT INTO accounts (bank_id, `name`, balance) VALUES ("98321732", "Test User 2", "11372");
 
-SELECT * FROM accounts;
+/*
+CREATE TABLE transactions(
+-- Id becomes an auto-incrementing primary key
+	id int NOT NULL AUTO_INCREMENT,
+-- bank_id
+	bank_id int NOT NULL DEFAULT -1,
+-- amount
+	amount int NOT NULL,
+-- timestamp
+	`date` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id)
+);
+*/
+
+SELECT accounts.bank_id, `name`, city, balance, transactions.amount, transactions.`date` FROM accounts JOIN transactions ON transactions.bank_id = accounts.bank_id ORDER BY accounts.id DESC;
