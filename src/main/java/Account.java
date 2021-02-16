@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class Account
@@ -14,8 +15,26 @@ public class Account
         this.user = user;
     }
     
-    public void deposit(int amount)
+    public List<Transaction> getTransactions()
     {
+        return transactions;
+    }
     
+    public void deposit(double amount)
+    {
+        // TODO: perhaps return balance
+        if(amount < 0)
+        {
+            // TODO: throw exception instead
+            System.out.println("Amount cannot be negative");
+            return;
+        }
+        transactions.add(new Transaction(amount, new Date()));
+    }
+    
+    public void withdraw(double amount)
+    {
+        // TODO: check if greater than balance
+        transactions.add(new Transaction(-amount, new Date()));
     }
 }
