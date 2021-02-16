@@ -1,5 +1,6 @@
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.List;
 
 public class Database
 {
@@ -10,9 +11,10 @@ public class Database
     {
         try
         {
+            //Kasper's locahost username/pass: root / 1234
             Class.forName(JDBC_DRIVER);
             connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/ellerød_bank",
-                    "root", "1234");
+                    "root", "h4bI1tAt10n");
         }
         catch (ClassNotFoundException | SQLException ex)
         {
@@ -26,7 +28,7 @@ public class Database
     public void addToDatabase(boolean employee, String name, int balance, String username, String password){
         try {
             PreparedStatement pstmt = null;
-            String sql = "INSERT INTO highscorers (employee, `name`, balance, username, `password`) VALUES (?, ?, ?, ?, ?)";
+            String sql = "INSERT INTO accounts (employee, `name`, balance, username, `password`) VALUES (?, ?, ?, ?, ?)";
         
             pstmt = connection.prepareStatement(sql);
         
@@ -49,7 +51,7 @@ public class Database
     public void addToDatabase(int bank_id, String name, String city, int balance, String username, String password){
         try {
             PreparedStatement pstmt = null;
-            String sql = "INSERT INTO highscorers (bank_id, `name`, city, balance, username, `password`) VALUES (?, ?, ?, ?, ?, ?)";
+            String sql = "INSERT INTO accounts (bank_id, `name`, city, balance, username, `password`) VALUES (?, ?, ?, ?, ?, ?)";
             
             pstmt = connection.prepareStatement(sql);
     
@@ -75,7 +77,7 @@ public class Database
         try
         {
             PreparedStatement pstmt = null;
-            String sql = "INSERT INTO highscorers (bank_id, `name`, city, balance) VALUES (?, ?, ?, ?)";
+            String sql = "INSERT INTO accounts (bank_id, `name`, city, balance) VALUES (?, ?, ?, ?)";
             
             pstmt = connection.prepareStatement(sql);
     
@@ -100,7 +102,7 @@ public class Database
         try
         {
             PreparedStatement pstmt = null;
-            String sql = "INSERT INTO highscorers (bank_id, `name`, balance) VALUES (?, ?, ?)";
+            String sql = "INSERT INTO accounts (bank_id, `name`, balance) VALUES (?, ?, ?)";
     
             pstmt = connection.prepareStatement(sql);
     
@@ -120,31 +122,125 @@ public class Database
     }
 //----------------------------------------------------------------------------------------------------------------------
     //POPULATE USER ARRAYLIST
-public void populateUserList(ArrayList<User> arrayList){
-    try {
-        PreparedStatement pstmt = null;
-        String sql = "SELECT * FROM acounts ORDER BY `name` DESC;";
-        
-        pstmt = connection.prepareStatement(sql);
-        
-        ResultSet rs = pstmt.executeQuery();
-        while (rs.next()) {
-            User user = new User(
-                rs.getBoolean("employee"),
-                rs.getInt("bank_id"),
-                rs.getString("name"),
-                rs.getString("city"),
-                rs.getInt("balance"),
-                rs.getString("username"),
-                rs.getString("password")
-            );
-            arrayList.add(user);
-        }
-        rs.close();
-        pstmt.close();
-        }
+    public void populateAccountsList(ArrayList<Account> arrayList){
+        try {
+            List<User> users = new ArrayList<>();
+            List<Transaction> transactionList = new ArrayList<>();
+
+            PreparedStatement pstmt = null;
+
+            //USERS
+            String sql = "SELECT * FROM accounts ORDER BY `created_at` ASC;";
+
+            pstmt = connection.prepareStatement(sql);
+
+            ResultSet rs = pstmt.executeQuery();
+
+            while (rs.next()) {
+                User user = new User(
+                    rs.getBoolean("employee"),
+                    rs.getInt("bank_id"),
+                    rs.getString("name"),
+                    rs.getString("city"),
+                    rs.getInt("balance"),
+                    rs.getString("username"),
+                    rs.getString("password")
+                );
+
+                users.add(user);
+            }
+
+            //TRANSACTIONS
+            sql = "SELECT * FROM transactions ORDER BY `date` ASC;";
+
+            pstmt = connection.prepareStatement(sql);
+
+            rs = pstmt.executeQuery();
+
+            while (rs.next()) {
+                Transaction transaction = new Transaction(
+                        rs.getInt("bank_id"),
+                        rs.getInt("amount"),
+                        rs.getDate("date")
+                );
+
+                transactionList.add(transaction);
+            }
+
+            rs.close();
+            pstmt.close();
+
+
+
+            for (int i = 0; i < users.size(); i++) {
+                List<Transaction> userSpecificTransactionList = new ArrayList<>();
+                for (int j = 0; j < transactionList.size(); j++) {
+
+                    //take specific instances where bank_ids are equal and add them to a new list
+                    if(transactionList.get(j).getBank_id() == users.get(i).getBank_id()) {
+                        userSpecificTransactionList.add(transactionList.get(j));
+                    }
+
+
+                }
+                Account account = new Account(userSpecificTransactionList, users.get(i));
+                arrayList.add(account);
+            }
+
+            }
         catch(SQLException ex){
             ex.printStackTrace();
         }
     }
+//----------------------------------------------------------------------------------------------------------------------
+    //VIEW LIST (takes in accounts arraylist and sometimes other specifying information)
+    public void viewUsersAll(ArrayList<Account> accounts){
+        for (int i = 0; i < accounts.size(); i++) {
+            System.out.println(
+                "User "+(i+1)+": \""+accounts.get(i).getUser().getName()+
+                "\" -- Bank ID: "+accounts.get(i).getUser().getBank_id()+
+                " -- Balance: "+accounts.get(i).getUser().getBalance()
+            );
+        }
+    }
+    public void viewUsersNotEmployees(ArrayList<Account> accounts){
+        for (int i = 0; i < accounts.size(); i++) {
+            if(!accounts.get(i).getUser().isEmployee()) {
+                System.out.println(
+                    "User " + (i + 1) + ": \"" + accounts.get(i).getUser().getName() +
+                    "\" -- Bank ID: " + accounts.get(i).getUser().getBank_id() +
+                    " -- Balance: " + accounts.get(i).getUser().getBalance()
+                );
+            }
+        }
+    }
+    public void viewAllTransactions(ArrayList<Account> accounts){
+        for (int i = 0; i < accounts.size(); i++) {
+            for (int j = 0; j < accounts.get(i).getTransactions().size(); j++) {
+                System.out.println(
+                    "User: \""+accounts.get(i).getUser().getName()+
+                    "\" -- Account num: "+accounts.get(i).getUser().getBank_id()+
+                    " -- Balance: "+accounts.get(i).getUser().getBalance()+
+                    " -- Transactions num "+j+": "+accounts.get(i).getTransactions().get(j).getAmount()
+                );
+            }
+        }
+    }
+    public void viewUserTransaction(ArrayList<Account> accounts, int bank_id){ //requires specific bank_id
+        for (int i = 0; i < accounts.size(); i++) {
+            if (accounts.get(i).getUser().getBank_id() == bank_id) {
+                System.out.println(
+                    "User: \"" + accounts.get(i).getUser().getName() +
+                    "\" -- Account ID: " + accounts.get(i).getUser().getBank_id() +
+                    " -- Balance: " + accounts.get(i).getUser().getBalance()
+                );
+                for (int j = 0; j < accounts.get(i).getTransactions().size(); j++) {
+                    System.out.println(
+                        "Transaction " + (j+1) + ": " + accounts.get(i).getTransactions().get(j).getAmount()
+                    );
+                }
+            }
+        }
+    }
+//----------------------------------------------------------------------------------------------------------------------
 }

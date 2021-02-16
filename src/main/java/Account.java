@@ -1,4 +1,3 @@
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -11,7 +10,7 @@ public class Account
     
     public Account(List<Transaction> transactions, User user)
     {
-        this.transactions = new ArrayList<>();
+        this.transactions = transactions;
         this.user = user;
     }
     
@@ -19,8 +18,12 @@ public class Account
     {
         return transactions;
     }
-    
-    public void deposit(double amount)
+
+    public User getUser() {
+        return user;
+    }
+
+    public void deposit(int bank_id, double amount)
     {
         // TODO: perhaps return balance
         if(amount < 0)
@@ -29,12 +32,12 @@ public class Account
             System.out.println("Amount cannot be negative");
             return;
         }
-        transactions.add(new Transaction(amount, new Date()));
+        transactions.add(new Transaction(bank_id, amount, new Date()));
     }
     
-    public void withdraw(double amount)
+    public void withdraw(int bank_id, double amount)
     {
         // TODO: check if greater than balance
-        transactions.add(new Transaction(-amount, new Date()));
+        transactions.add(new Transaction(bank_id, amount, new Date()));
     }
 }

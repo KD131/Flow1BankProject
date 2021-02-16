@@ -1,7 +1,9 @@
+import java.util.ArrayList;
+
 public class Main
 {
     public static void main(String[] args)
     {
-        Bank b1 = new Bank("Ebberød Bank","Ebberød");
+        //Bank b1 = new Bank("Ebberød Bank","Ebberød"); //commented out since it throws an error
     }
 }

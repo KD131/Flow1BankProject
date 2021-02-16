@@ -43,4 +43,4 @@ CREATE TABLE transactions(
 );
 */
 
-SELECT accounts.bank_id, `name`, city, balance, transactions.amount, transactions.`date` FROM accounts JOIN transactions ON transactions.bank_id = accounts.bank_id ORDER BY accounts.id DESC;
+SELECT accounts.bank_id, `name`, city, balance, transactions.amount, transactions.`date` FROM accounts JOIN transactions ON transactions.bank_id = accounts.bank_id ORDER BY `created_at` ASC;
