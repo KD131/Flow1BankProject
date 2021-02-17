@@ -16,18 +16,18 @@ public class Account
     {
         return transactions;
     }
-<<<<<<< HEAD
 
     public User getUser() {
         return user;
     }
-
-    public void deposit(int bank_id, double amount)
-=======
     
-    public double getBalance()
+    public int getBank_id(){
+        return user.getBank_id();
+    }
+    
+    public int getBalance()
     {
-        double sum = 0;
+        int sum = 0;
         for (Transaction t : transactions)
         {
             sum += t.getAmount();
@@ -35,33 +35,27 @@ public class Account
         return sum;
     }
     
-    public double deposit(double amount)
->>>>>>> ef5545e538406f548bf9e1ca62ae0589f506572c
+    public boolean deposit(int amount)
     {
         if(amount < 0)
         {
             // TODO: throw exception instead
-            System.out.println("Amount cannot be negative");
-            return -1;
+            System.out.println("Amount cannot be negative.");
+            return false;
         }
-<<<<<<< HEAD
-        transactions.add(new Transaction(bank_id, amount, new Date()));
+        transactions.add(new Transaction(this.user.getBank_id(), amount, new Date()));
+        return true;
     }
     
-    public void withdraw(int bank_id, double amount)
+    public boolean withdraw(int amount)
     {
-        // TODO: check if greater than balance
-        transactions.add(new Transaction(bank_id, amount, new Date()));
-=======
-        transactions.add(new Transaction(amount, new Date()));
-        return getBalance();
-    }
-    
-    public double withdraw(double amount)
-    {
-        // TODO: check if greater than balance
-        transactions.add(new Transaction(-amount, new Date()));
-        return getBalance();
->>>>>>> ef5545e538406f548bf9e1ca62ae0589f506572c
+        if(amount > getBalance())
+        {
+            // TODO: throw exception instead
+            System.out.println("Amount to withdraw cannot be greater than balance.");
+            return false;
+        }
+        transactions.add(new Transaction(this.user.getBank_id(), -amount, new Date()));
+        return true;
     }
 }
