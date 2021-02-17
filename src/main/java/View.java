@@ -20,7 +20,6 @@ public class View {
             showMenu();
             
             String menu = in.nextLine();
-            intValidation(menu,1,2);
             
             switch (menu)
             {
@@ -29,19 +28,21 @@ public class View {
                     break;
     
                 case "2": //exit
+                    System.out.println("Goodbye.");
                     running = false;
                     break;
     
                 default:
                     System.out.println("Invalid input.");
-                    return;
+                    break;
             }
         }
     }
     
     private void showMenu() {
         System.out.println(
-            "1) Log in" +
+            "--- Welcome to Ellerød Bank ---" +
+            "\n1) Log in" +
             "\n2) Shutdown"
         );
     }
@@ -70,53 +71,143 @@ public class View {
             "\n2) Facilitate Transfer" + //withdraw money from one bank_id and deposit on another
             "\n3) Show Transactions" +
             "\n4) Show Accounts" +
-            "\n5) Delete Accounts" +
-            "\n6) Logout"
+            "\n5) Logout"
         );
         String menu = in.nextLine();
-        intValidation(menu,1,5);
+        
+        switch(menu){
+            case "1": //Create account
+                System.out.println("--- Creating an Account ---\n");
+                try
+                {
+                    System.out.println("Enter Account Number (8-digits):");
+                    int bank_id = in.nextInt();
+                    in.nextLine();      // to remove the new-line after nextInt().
+                    System.out.println("Enter Name:");
+                    String name = in.nextLine();
+                    System.out.println("Enter City:");
+                    String city = in.nextLine();
+                    System.out.println("Enter Username:");
+                    String username = in.nextLine();
+                    System.out.println("Enter Password:");
+                    String password = in.nextLine();
+    
+                    bank.createAccount(bank_id,name,city,username,password);
+                }
+                catch(InputMismatchException ex){
+                    System.out.println("Incorrect input.");
+                }
+                employeeSelection(account, in);
+                break;
+                
+            case "2": //Facilitate transfer
+                System.out.println("--- Transfer from Account to Account ---\n");
+                try
+                {
+                    System.out.println("Enter Account to transfer from:");
+                    int id1 = in.nextInt();
+                    in.nextLine();      // to remove the new-line after nextInt().
+                    bank.showUsersBalance(id1);
+                    System.out.println("Enter Account to transfer to:");
+                    int id2 = in.nextInt();
+                    in.nextLine();
+                    System.out.println("Enter amount:");
+                    int amount = in.nextInt();
+                    in.nextLine();
+    
+                    bank.transfer(id1,id2,amount);
+                }
+                catch(InputMismatchException ex){
+                    System.out.println("Incorrect input.");
+                }
+                employeeSelection(account, in);
+                break;
+                
+            case "3": //Show all transactions
+                bank.showAllTransactions();
+                employeeSelection(account, in);
+                break;
+                
+            case "4": //Show single account and its transactions
+                System.out.println("Enter Account ID to show:");
+                int id = in.nextInt();
+                in.nextLine();
+                bank.showUserTransactions(id);
+                employeeSelection(account, in);
+                break;
+    
+            case "5": //Logout
+                System.out.println("Logging out...");
+                break;
+                
+            default:
+                System.out.println("Invalid input.");
+                employeeSelection(account, in);
+                break;
+        }
+    
     }
     
     public void customerSelection(Account account, Scanner in){
         System.out.println(
             "1) Deposit" +
             "\n2) Withdraw" +
-            "\n3) Transfer" +
-            "\n4) Show Transactions" +
-            "\n5) Logout"
+            "\n3) Show Transactions" +
+            "\n4) Logout"
         );
         String menu = in.nextLine();
-        intValidation(menu,1,4);
+    
+        switch(menu){
+            case "1": //Deposit
+                try
+                {
+                    System.out.print("Amount to deposit: ");
+                    int amount = in.nextInt();
+                    bank.deposit(account,amount);
+                }
+                catch (InputMismatchException ex){
+                    System.out.println("Invalid input.");
+                }
+                in.nextLine();      // to remove the new-line after nextInt().
+                customerSelection(account, in);
+                break;
+        
+            case "2": //Withdraw
+                System.out.print("Amount to withdraw: ");
+                try
+                {
+                    int amount = in.nextInt();
+                    bank.withdraw(account,amount);
+                }
+                catch (InputMismatchException ex){
+                    System.out.println("Invalid input.");
+                }
+                in.nextLine();      // to remove the new-line after nextInt().
+                customerSelection(account, in);
+                break;
+        
+            case "3": //Show transactions
+                bank.showUserTransactions(account);
+                customerSelection(account, in);
+                break;
+        
+            case "4": //Logout
+                System.out.println("Logging out...");
+                break;
+        
+            default:
+                System.out.println("Invalid input.");
+                employeeSelection(account, in);
+                break;
+        }
     }
     
-    //TODO: employees should be able to create accounts
-    public int intValidation(String question, int min, int max)
-    {
-        Scanner in = new Scanner(System.in);
-        int input = 0;
-        System.out.println(question);
-        boolean exitLoop = false;
-        do
-        {
-            input = in.nextInt();
-            if (input < min || input > max)
-            {
-                System.out.println("invalid input please specify a number between " + min + " and " + max);
-                exitLoop = false;
-            } else
-            {
-                exitLoop = true;
-            
-            }
-        } while (!exitLoop);
-        return input;
-    }
     
     public boolean loginVerifier(String username, String password){
         for (int i = 0; i < bank.getAccounts().size(); i++)
         {
-            if(username == bank.getAccounts().get(i).getUser().getUsername() &&
-               password == bank.getAccounts().get(i).getUser().getPassword())
+            if(username.equals(bank.getAccounts().get(i).getUser().getUsername()) &&
+               password.equals(bank.getAccounts().get(i).getUser().getPassword()))
             {
                 loggedIn = bank.getAccounts().get(i);
                 return true;

@@ -1,5 +1,7 @@
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 /***
@@ -52,19 +54,18 @@ public class Database
         }
     }
         //ADD ACCOUNT THAT ISN'T EMPLOYEE
-    public void addToDatabase(int bank_id, String name, String city, int balance, String username, String password){
+    public void addToDatabase(int bank_id, String name, String city, String username, String password){
         try {
             PreparedStatement pstmt = null;
-            String sql = "INSERT INTO accounts (bank_id, `name`, city, balance, username, `password`) VALUES (?, ?, ?, ?, ?, ?)";
+            String sql = "INSERT INTO accounts (bank_id, `name`, city, username, `password`) VALUES (?, ?, ?, ?, ?)";
             
             pstmt = connection.prepareStatement(sql);
     
             pstmt.setInt(1, bank_id);
             pstmt.setString(2, name);
             pstmt.setString(3, city);
-            pstmt.setInt(4, balance);
-            pstmt.setString(5, username);
-            pstmt.setString(6, password);
+            pstmt.setString(4, username);
+            pstmt.setString(5, password);
             
             pstmt.executeUpdate();
             
@@ -167,7 +168,7 @@ public class Database
                 Transaction transaction = new Transaction(
                     rs.getInt("bank_id"),
                     rs.getInt("amount"),
-                    rs.getDate("date")
+                    rs.getString("date")
                 );
 
                 transactionList.add(transaction);
@@ -210,16 +211,19 @@ public class Database
         
             pstmt = connection.prepareStatement(sql);
         
-            pstmt.setInt(1,bank_id);
+            pstmt.setInt(2,bank_id);
             
             for (int i = 0; i < accounts.size(); i++) //for loop that checks for correct bank_id
             {
                 if(accounts.get(i).getUser().getBank_id() == bank_id)
                 {
-                    Account account = new Account(accounts.get(i).getTransactions(),accounts.get(i).getUser());
-                    pstmt.setInt(2, account.getBalance() + amount);
+                    int newBalance = accounts.get(i).getUser().getBalance() + amount;
+                    pstmt.setInt(1, newBalance);
                 }
             }
+            
+            pstmt.executeUpdate();
+            
     
             sql = "INSERT INTO transactions (bank_id, amount) VALUES (?, ?);";
     
@@ -267,7 +271,8 @@ public class Database
                     "User: \""+accounts.get(i).getUser().getName()+
                     "\" -- Account num: "+accounts.get(i).getUser().getBank_id()+
                     " -- Balance: "+accounts.get(i).getUser().getBalance()+
-                    " -- Transactions num "+(j+1)+": "+accounts.get(i).getTransactions().get(j).getAmount()
+                    " -- Transactions num "+(j+1)+": "+accounts.get(i).getTransactions().get(j).getAmount()+
+                    " --- "+accounts.get(i).getTransactions().get(j).getDate()
                 );
             }
         }
@@ -282,7 +287,8 @@ public class Database
                 );
                 for (int j = 0; j < accounts.get(i).getTransactions().size(); j++) {
                     System.out.println(
-                        "Transaction " + (j+1) + ": " + accounts.get(i).getTransactions().get(j).getAmount()
+                        "Transaction " + (j+1) + ": " + accounts.get(i).getTransactions().get(j).getAmount()+
+                        " --- "+accounts.get(i).getTransactions().get(j).getDate()
                     );
                 }
             }

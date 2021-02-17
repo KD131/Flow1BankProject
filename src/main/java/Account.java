@@ -1,3 +1,4 @@
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -27,23 +28,26 @@ public class Account
     
     public int getBalance()
     {
+        /*
         int sum = 0;
         for (Transaction t : transactions)
         {
             sum += t.getAmount();
         }
         return sum;
+        */
+        return user.getBalance();
     }
     
     public boolean deposit(int amount)
     {
-        if(amount < 0)
+        if(amount <= 0)
         {
             // TODO: throw exception instead
-            System.out.println("Amount cannot be negative.");
+            System.out.println("Amount cannot be negative or 0.");
             return false;
         }
-        transactions.add(new Transaction(this.user.getBank_id(), amount, new Date()));
+        transactions.add(new Transaction(this.user.getBank_id(), amount, LocalDateTime.now().toString()));
         return true;
     }
     
@@ -55,7 +59,7 @@ public class Account
             System.out.println("Amount to withdraw cannot be greater than balance.");
             return false;
         }
-        transactions.add(new Transaction(this.user.getBank_id(), -amount, new Date()));
+        transactions.add(new Transaction(this.user.getBank_id(), -amount, LocalDateTime.now().toString()));
         return true;
     }
 }
