@@ -3,14 +3,12 @@ USE ellerød_bank;
 
 /*
 CREATE TABLE accounts(
--- Id becomes an auto-incrementing primary key
-	id int NOT NULL AUTO_INCREMENT,
 -- timestamp
 	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 -- employee (0 = "no" | 1 = "yes")
 	employee boolean NOT NULL DEFAULT 0,
 -- bank_id
-	bank_id int NOT NULL DEFAULT -1,
+	bank_id int NOT NULL AUTO_INCREMENT,
 -- name
 	`name` varchar(80) NOT NULL,
 -- city
@@ -21,7 +19,7 @@ CREATE TABLE accounts(
 	username varchar(25) NOT NULL DEFAULT "user",
 -- password
 	`password` varchar(8) NOT NULL DEFAULT "0000",
-    PRIMARY KEY (id)
+    PRIMARY KEY (bank_id)
 );
 */
 
@@ -31,7 +29,7 @@ CREATE TABLE accounts(
 
 /*
 CREATE TABLE transactions(
--- Id becomes an auto-incrementing primary key
+-- id
 	id int NOT NULL AUTO_INCREMENT,
 -- bank_id
 	bank_id int NOT NULL DEFAULT -1,
@@ -43,4 +41,7 @@ CREATE TABLE transactions(
 );
 */
 
-SELECT accounts.bank_id, `name`, city, balance, transactions.amount, transactions.`date` FROM accounts JOIN transactions ON transactions.bank_id = accounts.bank_id ORDER BY `created_at` ASC;
+-- UPDATE accounts SET balance = '3900' WHERE bank_id = '60982341';
+-- INSERT INTO transactions (bank_id, amount) VALUES ('1', '5000');
+
+ SELECT accounts.bank_id, `name`, city, balance, transactions.amount, transactions.`date` FROM accounts JOIN transactions ON transactions.bank_id = accounts.bank_id ORDER BY `created_at` ASC;
