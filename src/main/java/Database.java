@@ -2,6 +2,10 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/***
+ * @Author Kris
+ */
+
 public class Database
 {
     final String JDBC_DRIVER = "com.mysql.cj.jdbc.Driver";
@@ -11,10 +15,10 @@ public class Database
     {
         try
         {
-            //Kasper's locahost username/pass: root / 1234
+            //Kasper's localhost username/pass: root / 1234
             Class.forName(JDBC_DRIVER);
             connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/ellerød_bank",
-                    "root", "h4bI1tAt10n");
+                    "root", "1234");
         }
         catch (ClassNotFoundException | SQLException ex)
         {
@@ -24,7 +28,7 @@ public class Database
     
 //----------------------------------------------------------------------------------------------------------------------
     //ADD TO DATABASE (overloaded)
-        //ADD ACCOUNT WITH ALL FIELDS
+        //ADD ACCOUNT FOR EMPLOYEE
     public void addToDatabase(boolean employee, String name, int balance, String username, String password){
         try {
             PreparedStatement pstmt = null;
@@ -122,8 +126,10 @@ public class Database
     }
 //----------------------------------------------------------------------------------------------------------------------
     //POPULATE USER ARRAYLIST
-    public void populateAccountsList(ArrayList<Account> arrayList){
+    public void populateAccountsList(List<Account> list){
         try {
+            list.clear();
+            
             List<User> users = new ArrayList<>();
             List<Transaction> transactionList = new ArrayList<>();
 
@@ -159,9 +165,9 @@ public class Database
 
             while (rs.next()) {
                 Transaction transaction = new Transaction(
-                        rs.getInt("bank_id"),
-                        rs.getInt("amount"),
-                        rs.getDate("date")
+                    rs.getInt("bank_id"),
+                    rs.getInt("amount"),
+                    rs.getDate("date")
                 );
 
                 transactionList.add(transaction);
@@ -184,7 +190,7 @@ public class Database
 
                 }
                 Account account = new Account(userSpecificTransactionList, users.get(i));
-                arrayList.add(account);
+                list.add(account);
             }
 
             }
@@ -193,8 +199,48 @@ public class Database
         }
     }
 //----------------------------------------------------------------------------------------------------------------------
+    //UPDATE
+        //BALANCE
+    public void updateBalance(List<Account> accounts, int bank_id, int amount)
+    {
+        try
+        {
+            PreparedStatement pstmt = null;
+            String sql = "UPDATE accounts SET balance = ? WHERE bank_id = ?";
+        
+            pstmt = connection.prepareStatement(sql);
+        
+            pstmt.setInt(1,bank_id);
+            
+            for (int i = 0; i < accounts.size(); i++) //for loop that checks for correct bank_id
+            {
+                if(accounts.get(i).getUser().getBank_id() == bank_id)
+                {
+                    Account account = new Account(accounts.get(i).getTransactions(),accounts.get(i).getUser());
+                    pstmt.setInt(2, account.getBalance() + amount);
+                }
+            }
+    
+            sql = "INSERT INTO transactions (bank_id, amount) VALUES (?, ?);";
+    
+            pstmt = connection.prepareStatement(sql);
+    
+            pstmt.setInt(1,bank_id);
+            pstmt.setInt(2,amount);
+        
+            pstmt.executeUpdate();
+        
+            pstmt.close();
+        
+        }
+        catch (SQLException ex)
+        {
+            ex.printStackTrace();
+        }
+    }
+//----------------------------------------------------------------------------------------------------------------------
     //VIEW LIST (takes in accounts arraylist and sometimes other specifying information)
-    public void viewUsersAll(ArrayList<Account> accounts){
+    public void viewUsersAll(List<Account> accounts){
         for (int i = 0; i < accounts.size(); i++) {
             System.out.println(
                 "User "+(i+1)+": \""+accounts.get(i).getUser().getName()+
@@ -203,7 +249,7 @@ public class Database
             );
         }
     }
-    public void viewUsersNotEmployees(ArrayList<Account> accounts){
+    public void viewUsersNotEmployees(List<Account> accounts){
         for (int i = 0; i < accounts.size(); i++) {
             if(!accounts.get(i).getUser().isEmployee()) {
                 System.out.println(
@@ -214,19 +260,19 @@ public class Database
             }
         }
     }
-    public void viewAllTransactions(ArrayList<Account> accounts){
+    public void viewAllTransactions(List<Account> accounts){
         for (int i = 0; i < accounts.size(); i++) {
             for (int j = 0; j < accounts.get(i).getTransactions().size(); j++) {
                 System.out.println(
                     "User: \""+accounts.get(i).getUser().getName()+
                     "\" -- Account num: "+accounts.get(i).getUser().getBank_id()+
                     " -- Balance: "+accounts.get(i).getUser().getBalance()+
-                    " -- Transactions num "+j+": "+accounts.get(i).getTransactions().get(j).getAmount()
+                    " -- Transactions num "+(j+1)+": "+accounts.get(i).getTransactions().get(j).getAmount()
                 );
             }
         }
     }
-    public void viewUserTransaction(ArrayList<Account> accounts, int bank_id){ //requires specific bank_id
+    public void viewUserTransaction(List<Account> accounts, int bank_id){ //requires specific bank_id
         for (int i = 0; i < accounts.size(); i++) {
             if (accounts.get(i).getUser().getBank_id() == bank_id) {
                 System.out.println(
